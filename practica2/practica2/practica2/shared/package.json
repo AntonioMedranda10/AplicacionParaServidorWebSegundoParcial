@@ -1,0 +1,28 @@
+{
+  "name": "nestjs-microservices-shared",
+  "version": "1.0.0",
+  "description": "Shared components for NestJS microservices project",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/core": "^9.0.0",
+    "class-validator": "^0.13.2",
+    "class-transformer": "^0.5.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.4",
+    "ts-jest": "^27.0.0",
+    "jest": "^27.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}

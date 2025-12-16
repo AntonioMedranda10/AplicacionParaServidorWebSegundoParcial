@@ -1,0 +1,158 @@
+{
+  "info": {
+    "name": "Practica1 - Gateway (completa)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.1"
+  },
+  "item": [
+    {
+      "name": "1 - Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2 - Listar spaces",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/gateway/spaces",
+          "host": ["{{baseUrl}}"],
+          "path": ["gateway","spaces"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3 - Crear reserva",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Guardar reservationId en el environment si la respuesta lo contiene",
+              "try {",
+              "  const json = pm.response.json();",
+              "  const id = json.id || (json.data && json.data.id) || json._id;",
+              "  if (id) { pm.environment.set('reservationId', id); console.log('reservationId saved:', id); }",
+              "} catch (e) { console.log('no json response or id not found'); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"spaceId\": \"{{spaceId}}\",\n  \"userId\": \"{{userId}}\",\n  \"from\": \"2026-01-10T10:00:00.000Z\",\n  \"to\": \"2026-01-10T12:00:00.000Z\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/gateway/reservations",
+          "host": ["{{baseUrl}}"],
+          "path": ["gateway","reservations"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4 - Obtener reserva por id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/gateway/reservations/{{reservationId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["gateway","reservations","{{reservationId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5 - RabbitMQ: ver mensajes en reservations_queue (API Management)",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "username", "value": "{{rabbitUser}}" },
+            { "key": "password", "value": "{{rabbitPass}}" }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"count\": 5,\n  \"ackmode\": \"ack_requeue_false\",\n  \"encoding\": \"auto\"\n}"
+        },
+        "url": {
+          "raw": "{{rabbitApi}}/queues/%2F/reservations_queue/get",
+          "host": ["{{rabbitApi}}"],
+          "path": ["queues","%2F","reservations_queue","get"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6 - RabbitMQ: publicar evento en exchange space_events",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "username", "value": "{{rabbitUser}}" },
+            { "key": "password", "value": "{{rabbitPass}}" }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"properties\": {},\n  \"routing_key\": \"space.created\",\n  \"payload\": \"{\\\"id\\\": \\\"space-1\\\"}\",\n  \"payload_encoding\": \"string\"\n}"
+        },
+        "url": {
+          "raw": "{{rabbitApi}}/exchanges/%2F/space_events/publish",
+          "host": ["{{rabbitApi}}"],
+          "path": ["exchanges","%2F","space_events","publish"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7 - RabbitMQ: ver conexiones (API)",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "username", "value": "{{rabbitUser}}" },
+            { "key": "password", "value": "{{rabbitPass}}" }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{rabbitApi}}/connections",
+          "host": ["{{rabbitApi}}"],
+          "path": ["connections"]
+        }
+      },
+      "response": []
+    }
+  ]
+}

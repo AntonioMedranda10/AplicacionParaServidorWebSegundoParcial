@@ -1,0 +1,13 @@
+# Shared package
+node_modules/
+dist/
+.env
+.env.*
+*.log
+.vscode/
+.DS_Store
+Thumbs.db
+
+# keep lockfiles committed
+!package-lock.json
+!yarn.lock

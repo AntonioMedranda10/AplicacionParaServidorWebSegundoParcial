@@ -1,0 +1,12 @@
+# Infra
+# Ignore any generated credentials or runtime state
+*.pem
+*.key
+*.env
+
+# Docker artifacts (local, not repo)
+rabbitmq-data/
+postgres-*data/
+
+.DS_Store
+.vscode/

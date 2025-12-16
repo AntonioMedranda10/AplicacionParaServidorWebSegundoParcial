@@ -1,0 +1,5 @@
+# Scripts
+*.log
+*.ps1.profile
+.DS_Store
+.vscode/

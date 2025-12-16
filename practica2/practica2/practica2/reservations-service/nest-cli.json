@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "assets": [
+      "**/*.html",
+      "**/*.svg"
+    ],
+    "watchAssets": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "plugins": []
+  }
+}

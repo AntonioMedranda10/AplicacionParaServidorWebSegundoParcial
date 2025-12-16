@@ -1,0 +1,19 @@
+# Node / Nest for spaces-service
+node_modules/
+dist/
+.env
+.env.*
+*.log
+coverage/
+.nyc_output/
+*.tsbuildinfo
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Redis / idempotency local data (if any)
+redis-data/
+
+# keep lockfiles committed
+!package-lock.json
+!yarn.lock

@@ -1,0 +1,60 @@
+{
+  "rabbit_version": "3.8.0",
+  "users": [
+    {
+      "name": "guest",
+      "password": "guest",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "policies": [],
+  "parameters": [],
+  "queues": [
+    {
+      "name": "reservations_queue",
+      "durable": true,
+      "arguments": {}
+    },
+    {
+      "name": "spaces_queue",
+      "durable": true,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "space_events",
+      "type": "topic",
+      "durable": true,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "space_events",
+      "destination": "reservations_queue",
+      "destination_type": "queue",
+      "routing_key": "space.created"
+    },
+    {
+      "source": "space_events",
+      "destination": "spaces_queue",
+      "destination_type": "queue",
+      "routing_key": "space.updated"
+    }
+  ]
+}

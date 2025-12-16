@@ -1,0 +1,144 @@
+version: '3.8'
+
+services:
+  postgres-spaces:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DATABASE_NAME_SPACES:-spaces_db}
+    volumes:
+      - postgres-spaces-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${DATABASE_NAME_SPACES:-spaces_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  postgres-reservations:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DATABASE_NAME_RESERVATIONS:-reservations_db}
+    volumes:
+      - postgres-reservations-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${DATABASE_NAME_RESERVATIONS:-reservations_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Local RabbitMQ (optional). If you provide RABBITMQ_URL in .env (CloudAMQP),
+  # services will use that external broker. Keep or remove this service as you prefer.
+  rabbitmq:
+    image: rabbitmq:3.9-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Redis used by spaces-service for idempotency
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  reservations-service:
+    build:
+      context: ./reservations-service
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL_RESERVATIONS:-postgres://postgres:postgres@postgres-reservations:5432/${DATABASE_NAME_RESERVATIONS:-reservations_db}}
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    ports:
+      - "${RESERVATIONS_PORT:-3001}:3001"
+    depends_on:
+      postgres-reservations:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+  spaces-service:
+    build:
+      context: ./spaces-service
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL_SPACES:-postgres://postgres:postgres@postgres-spaces:5432/${DATABASE_NAME_SPACES:-spaces_db}}
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    ports:
+      - "${SPACES_PORT:-3002}:3002"
+    depends_on:
+      postgres-spaces:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      - PORT=${GATEWAY_PORT:-3000}
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://guest:guest@rabbitmq:5672}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    ports:
+      - "${GATEWAY_PORT:-3000}:3000"
+    depends_on:
+      - reservations-service
+      - spaces-service
+      - rabbitmq
+    networks:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+  rabbitmq-data:
+  postgres-spaces-data:
+  postgres-reservations-data:
+
+networks:
+  backend:
+    driver: bridge

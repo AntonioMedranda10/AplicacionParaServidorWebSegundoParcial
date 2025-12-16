@@ -1,0 +1,16 @@
+# Node / Nest for gateway-service
+node_modules/
+dist/
+.env
+.env.*
+*.log
+coverage/
+.nyc_output/
+*.tsbuildinfo
+.vscode/
+.DS_Store
+Thumbs.db
+
+# keep lockfiles committed
+!package-lock.json
+!yarn.lock

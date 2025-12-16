@@ -1,0 +1,40 @@
+model Reservation {
+  id          Int      @id @default(autoincrement())
+  spaceId     Int
+  userId      Int
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  space       Space    @relation(fields: [spaceId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Space {
+  id          Int          @id @default(autoincrement())
+  name        String
+  location    String
+  capacity    Int
+  reservations Reservation[]
+
+  @@map("spaces")
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  name        String
+  email       String       @unique
+  reservations Reservation[]
+
+  @@map("users")
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}

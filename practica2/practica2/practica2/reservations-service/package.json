@@ -1,0 +1,49 @@
+{
+  "name": "reservations-service",
+  "version": "1.0.0",
+  "description": "Microservicio para gestionar reservas",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "nest start",
+    "build": "nest build",
+    "start:dev": "nest start --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint . --ext .ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/core": "^9.0.0",
+    "@nestjs/microservices": "^9.0.0",
+    "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/typeorm": "^9.0.0",
+    "@nestjs/config": "^2.2.0",
+    "class-validator": "^0.13.2",
+    "class-transformer": "^0.5.1",
+    "axios": "^1.6.0",
+    "prisma": "^3.0.0",
+    "rxjs": "^7.0.0",
+    "typeorm": "^0.3.0",
+    "pg": "^8.7.1",
+    "amqplib": "^0.8.0",
+    "amqp-connection-manager": "^4.1.0"
+    ,
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^9.0.0",
+    "@nestjs/testing": "^9.0.0",
+    "typescript": "^4.5.4",
+    "@types/uuid": "^8.3.4",
+    "ts-jest": "^27.0.0",
+    "jest": "^27.0.0",
+    "eslint": "^7.32.0",
+    "prettier": "^2.5.1"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "testEnvironment": "node"
+  }
+}
