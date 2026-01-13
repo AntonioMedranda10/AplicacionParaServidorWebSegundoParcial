@@ -1,0 +1,19 @@
+# Dependencias
+node_modules/
+__pycache__/
+
+# Archivos de entorno
+.env
+.env.local
+
+# IDEs
+.vscode/
+.idea/
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
